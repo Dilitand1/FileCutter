@@ -20,26 +20,14 @@ public class Main {
 
     public static void run(String[] args) throws IOException {
         if (args.length > 1 && args.length < 5) {
-            if (args[0].equals("-s")) {
-                SplitFile.splitFacade(args[1],
-                        args.length > 2 ? args[2] : null,
-                        args.length > 3 ? args[3] : null);
-            } else if (args[0].equals("-m")) {
-                MergeFiles.mergeFacade(args[1]
-                        , args.length > 2 ? args[2] : null);
-            } else {
-                System.out.println("wrong option");
-            }
+            FileWorkerI fileWorkerI = FactoryFileWorker.getFileWorker(args[0]);
+            fileWorkerI.work(args);
         } else {
-            System.out.println("wrong input");
-            System.out.println("-s split option\n-m merge option\n");
-            System.out.println("-s pathToInputFile [size of piece in Mb(default 1mb)] [pathToOutputDirectory(default result*)] ");
-            System.out.println("-m pathToFirstPart [pathToOutputFile]");
+            FactoryFileWorker.printHelp();
         }
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Press any key to exit");
         scanner.nextLine();
     }
-
 }

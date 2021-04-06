@@ -9,7 +9,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-public class MergeFiles {
+public class MergeFiles implements FileWorkerI {
+
+
 
     public static void mergeFacade(String firstFile, String resultFile) throws IOException {
         mergeFacade(new File(firstFile), resultFile == null ? null : new File(resultFile));
@@ -61,5 +63,15 @@ public class MergeFiles {
                 (File dir, String name) -> name.matches(destFileName + "[.]\\d+"));
         Arrays.sort(files);//ensuring order 001, 002, ..., 010, ...
         return Arrays.asList(files);
+    }
+
+    @Override
+    public void work(String[] args) {
+        try {
+            MergeFiles.mergeFacade(args[1]
+                    , args.length > 2 ? args[2] : null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

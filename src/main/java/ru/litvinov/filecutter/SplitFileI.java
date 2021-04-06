@@ -6,7 +6,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
 import java.util.Scanner;
 
-public class SplitFile {
+public class SplitFileI implements FileWorkerI {
 
     public static void splitFacade(String inputStringFile, String size, String outputStringDirectory) throws IOException {
         File inputFile = new File(inputStringFile);
@@ -32,8 +32,9 @@ public class SplitFile {
                     break;
                 }
                 if (input.equalsIgnoreCase("Y")) {
+                    clearResultDirectory(Paths.get(outputDirectory.getAbsolutePath()));
                     createResultDirectory(outputDirectory.getAbsolutePath());
-                    splitFile(inputFile, outputDirectory, partSizeMb);
+                    splitFile(inputFile, partSizeMb, outputDirectory);
                     break;
                 }
             }
@@ -44,7 +45,7 @@ public class SplitFile {
 
     }
 
-    private static void splitFile(File inputFile, File outputDirectory, Integer partSizeMb) throws IOException {
+    private static void splitFile(File inputFile, Integer partSizeMb, File outputDirectory) throws IOException {
         System.out.println("Splitting...");
         int partCounter = 1;//I like to name parts from 001, 002, 003, ...
         //you can change it to 0 if you want 000, 001, ...
@@ -78,13 +79,9 @@ public class SplitFile {
                         @Override
                         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                                 throws IOException {
-                            Files.delete(file);
-                            return FileVisitResult.CONTINUE;
-                        }
-
-                        @Override
-                        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                            Files.delete(dir);
+                            if (file.getFileName().toString().matches(".+\\.\\d{3}")) {
+                                Files.delete(file);
+                            }
                             return FileVisitResult.CONTINUE;
                         }
                     }
@@ -96,6 +93,17 @@ public class SplitFile {
         Path path1 = Paths.get(path);
         if (!Files.exists(path1)) {
             Files.createDirectories(path1);
+        }
+    }
+
+    @Override
+    public void work(String[] args) {
+        try {
+            SplitFileI.splitFacade(args[1],
+                    args.length > 2 ? args[2] : null,
+                    args.length > 3 ? args[3] : null);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
