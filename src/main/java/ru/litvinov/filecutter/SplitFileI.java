@@ -63,10 +63,13 @@ public class SplitFileI implements FileWorkerI {
 
                 //write each chunk of data into separate file with different number in name
                 String filePartName = String.format("%s.%03d", fileName, partCounter++);
-                File newFile = new File(outputDirectory + "\\" + filePartName);
+                File newFile = new File(outputDirectory + "/" + filePartName);
 
                 try (FileOutputStream out = new FileOutputStream(newFile)) {
                     out.write(buffer, 0, bytesAmount);
+                    out.flush();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }
